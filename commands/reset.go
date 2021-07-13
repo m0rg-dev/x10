@@ -10,7 +10,7 @@ import (
 type ResetCommand struct{}
 
 func init() {
-	RegisterCommand("reset", ResetCommand{})
+	RegisterCommand(ResetCommand{}, "reset", "Uninstall all packages except for base-minimal.")
 }
 
 func (cmd ResetCommand) Run(args []string) error {

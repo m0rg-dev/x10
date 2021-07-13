@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"m0rg.dev/x10/conf"
 	"m0rg.dev/x10/x10_log"
 )
 
@@ -13,8 +14,9 @@ type Command interface {
 
 var registry = map[string]Command{}
 
-func RegisterCommand(name string, cmd Command) {
+func RegisterCommand(cmd Command, name string, synopsis string) {
 	registry[name] = cmd
+	conf.RegisterCommand(name, synopsis)
 }
 
 func RunCommand(name string, args []string) {

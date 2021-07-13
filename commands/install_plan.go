@@ -1,9 +1,6 @@
 package commands
 
 import (
-	"flag"
-	"os"
-
 	"m0rg.dev/x10/conf"
 	"m0rg.dev/x10/db"
 	"m0rg.dev/x10/plumbing"
@@ -13,18 +10,22 @@ import (
 type InstallPlanCommand struct{}
 
 func init() {
-	RegisterCommand("install_plan", InstallPlanCommand{})
+	RegisterCommand(InstallPlanCommand{}, "install_plan",
+		"[install_plan options] <package name> <target>")
+	conf.RegisterKey("install_plan", "dot", conf.ConfigKey{
+		HelpText:   "Output dependency tree in GraphViz .dot format",
+		TakesValue: false,
+		Default:    "false",
+	})
 }
 
 func (cmd InstallPlanCommand) Run(args []string) error {
 	logger := x10_log.Get("main")
 
-	installPlanCmd := flag.NewFlagSet("install_plan", flag.ExitOnError)
-	//installPlanDot := installPlanCmd.Bool("dot", false, "Print .dot of dependency graph to stdout")
+	conf.AssertArgumentCount("install_plan", 2, args)
 
-	installPlanCmd.Parse(os.Args[2:])
-	atom := installPlanCmd.Arg(0)
-	target := installPlanCmd.Arg(1)
+	atom := args[0]
+	target := args[1]
 
 	pkgdb := db.PackageDatabase{BackingFile: conf.PkgDb()}
 	world, err := plumbing.AddPackageToLocalWorld(pkgdb, target, atom)

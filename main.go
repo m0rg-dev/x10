@@ -1,21 +1,29 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 
-	"github.com/davecgh/go-spew/spew"
 	"m0rg.dev/x10/commands"
 	"m0rg.dev/x10/conf"
-	"m0rg.dev/x10/db"
-	"m0rg.dev/x10/lib"
-	"m0rg.dev/x10/plumbing"
-	"m0rg.dev/x10/spec"
-	"m0rg.dev/x10/x10_log"
 )
 
+func init() {
+	conf.RegisterKey("", "packages", conf.ConfigKey{
+		HelpText:   "Path to the directory containing package definitions.",
+		TakesValue: true,
+		Default:    "../digitalis-linux/pkgs",
+	})
+}
+
+func main() {
+	command, args := conf.ParseCommandLine(os.Args[1:])
+	fmt.Printf("%+v\n", command)
+	fmt.Printf("%+v\n", args)
+	commands.RunCommand(command, args)
+}
+
+/*
 func main() {
 
 	buildCmd := flag.NewFlagSet("build", flag.ExitOnError)
@@ -158,3 +166,4 @@ func main() {
 		commands.RunCommand(os.Args[1], os.Args)
 	}
 }
+*/
