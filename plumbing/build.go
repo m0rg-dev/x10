@@ -79,6 +79,12 @@ func Build(name string) error {
 			return err
 		}
 	}
+
+	logger.Infof("Building dependencies (run).")
+	for _, atom := range pkg.Depends.Run {
+		Build(atom)
+	}
+
 	return nil
 }
 
