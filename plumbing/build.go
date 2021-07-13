@@ -64,7 +64,7 @@ func Build(name string) error {
 		}
 
 		for _, dep := range pkgs {
-			logger.Infof("To install: " + pkg.GetFQN())
+			logger.Infof("To install: " + dep.GetFQN())
 			if !dep.GeneratedValid {
 				err = Build(dep.Meta.Name)
 				if err != nil {
