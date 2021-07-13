@@ -25,6 +25,12 @@ func init() {
 		Default:    "true",
 		TakesValue: false,
 	})
+
+	conf.RegisterKey("build", "force", conf.ConfigKey{
+		HelpText:   "Build the top-level package even if it's up to date.",
+		Default:    "false",
+		TakesValue: false,
+	})
 }
 
 func (cmd BuildCommand) Run(args []string) error {
@@ -40,12 +46,27 @@ func (cmd BuildCommand) Run(args []string) error {
 		logger.Fatal(err)
 	}
 
-	if conf.GetBool("build:reset") {
-		logger.Info("Removing autodeps")
-		err := plumbing.Reset(logger, conf.Get("build:target-root"))
-		if err != nil {
-			logger.Fatal(err)
-		}
+	// if conf.GetBool("build:reset") {
+	// 	logger.Info("Removing autodeps")
+	// 	err := plumbing.Reset(logger, conf.Get("build:target-root"))
+	// 	if err != nil {
+	// 		logger.Fatal(err)
+	// 	}
+	// }
+
+	contents, err := pkgdb.Read()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	fqn, err := contents.FindFQN(args[0])
+	if err != nil {
+		return err
+	}
+
+	if contents.Packages[*fqn].GeneratedValid && !conf.GetBool("build:force") {
+		logger.Info("(already built)")
+		return nil
 	}
 
 	return plumbing.Build(args[0])
