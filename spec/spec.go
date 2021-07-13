@@ -85,7 +85,7 @@ func (pkg SpecLayer) ToDB() SpecDbData {
 }
 
 func (pkg SpecDbData) ToLayer() (*SpecLayer, error) {
-	return LoadPackage(filepath.Join(conf.PackageDir(), pkg.Meta.Name+".yml"))
+	return LoadPackage(filepath.Join(conf.Get("packages"), pkg.Meta.Name+".yml"))
 }
 
 func LoadPackage(pkgsrc string) (*SpecLayer, error) {
@@ -111,7 +111,7 @@ func LoadPackage(pkgsrc string) (*SpecLayer, error) {
 	layers := make([]SpecLayer, len(pkg.Layers)+1)
 	for idx, layer_name := range pkg.Layers {
 		logger.Debug("Loading layer: ", layer_name)
-		layer, err := LoadPackage(filepath.Join(conf.PackageDir(), "layers", layer_name+".yml"))
+		layer, err := LoadPackage(filepath.Join(conf.Get("packages"), "layers", layer_name+".yml"))
 		if err != nil {
 			return nil, err
 		}

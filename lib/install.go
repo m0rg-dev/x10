@@ -39,7 +39,7 @@ func Install(pkgdb db.PackageDatabase, pkg spec.SpecDbData, root string) error {
 	if err != nil {
 		return err
 	}
-	extract_cmd := exec.Command("tar", "xvf", filepath.Join(conf.HostDir(), "binpkgs", pkg.GetFQN()+".tar.xz"), "-C", tmp_path)
+	extract_cmd := exec.Command("tar", "xvf", filepath.Join(conf.Get("repo"), "binpkgs", pkg.GetFQN()+".tar.xz"), "-C", tmp_path)
 	out, err := extract_cmd.CombinedOutput()
 	if err != nil {
 		logger.Error(string(out))
@@ -112,7 +112,7 @@ func Install(pkgdb db.PackageDatabase, pkg spec.SpecDbData, root string) error {
 func Remove(pkgdb db.PackageDatabase, pkg spec.SpecDbData, root string) error {
 	logger := x10_log.Get("remove").WithField("pkg", pkg.GetFQN())
 
-	extract_cmd := exec.Command("tar", "tf", filepath.Join(conf.HostDir(), "binpkgs", pkg.GetFQN()+".tar.xz"))
+	extract_cmd := exec.Command("tar", "tf", filepath.Join(conf.Get("repo"), "binpkgs", pkg.GetFQN()+".tar.xz"))
 	out, err := extract_cmd.CombinedOutput()
 
 	if err != nil {

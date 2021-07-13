@@ -2,13 +2,13 @@ package plumbing
 
 import (
 	"github.com/sirupsen/logrus"
-	"m0rg.dev/x10/conf"
 	"m0rg.dev/x10/db"
 	"m0rg.dev/x10/lib"
+	"m0rg.dev/x10/x10_util"
 )
 
 func Reset(logger *logrus.Entry, root string) error {
-	pkgdb := db.PackageDatabase{BackingFile: conf.PkgDb()}
+	pkgdb := db.PackageDatabase{BackingFile: x10_util.PkgDb(root)}
 
 	world, err := GetWorld(root)
 	if err != nil {

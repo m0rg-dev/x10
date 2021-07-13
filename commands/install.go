@@ -6,6 +6,7 @@ import (
 	"m0rg.dev/x10/lib"
 	"m0rg.dev/x10/plumbing"
 	"m0rg.dev/x10/x10_log"
+	"m0rg.dev/x10/x10_util"
 )
 
 type InstallCommand struct{}
@@ -18,11 +19,11 @@ func init() {
 func (cmd InstallCommand) Run(args []string) error {
 	logger := x10_log.Get("main")
 
-	pkgdb := db.PackageDatabase{BackingFile: conf.PkgDb()}
 	conf.AssertArgumentCount("install", 2, args)
-
 	atom := args[0]
 	target := args[1]
+
+	pkgdb := db.PackageDatabase{BackingFile: x10_util.PkgDb(target)}
 
 	world, err := plumbing.AddPackageToLocalWorld(pkgdb, target, atom)
 	if err != nil {

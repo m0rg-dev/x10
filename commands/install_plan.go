@@ -5,6 +5,7 @@ import (
 	"m0rg.dev/x10/db"
 	"m0rg.dev/x10/plumbing"
 	"m0rg.dev/x10/x10_log"
+	"m0rg.dev/x10/x10_util"
 )
 
 type InstallPlanCommand struct{}
@@ -27,7 +28,7 @@ func (cmd InstallPlanCommand) Run(args []string) error {
 	atom := args[0]
 	target := args[1]
 
-	pkgdb := db.PackageDatabase{BackingFile: conf.PkgDb()}
+	pkgdb := db.PackageDatabase{BackingFile: x10_util.PkgDb(target)}
 	world, err := plumbing.AddPackageToLocalWorld(pkgdb, target, atom)
 	if err != nil {
 		return err

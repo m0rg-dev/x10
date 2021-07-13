@@ -14,6 +14,18 @@ func init() {
 		TakesValue: true,
 		Default:    "../digitalis-linux/pkgs",
 	})
+
+	conf.RegisterKey("", "repo", conf.ConfigKey{
+		HelpText:   "Path to the binary package repository.",
+		TakesValue: true,
+		Default:    "../digitalis-linux/hostdir",
+	})
+
+	conf.RegisterKey("", "use-generated", conf.ConfigKey{
+		HelpText:   "Disable evaluation of generated dependencies.",
+		TakesValue: false,
+		Default:    "true",
+	})
 }
 
 func main() {

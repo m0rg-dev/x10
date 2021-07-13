@@ -30,7 +30,7 @@ func (db *PackageDatabase) IndexFromRepo() error {
 
 	var updates sync.Map
 
-	filepath.WalkDir(conf.PackageDir(), func(path string, d fs.DirEntry, err error) error {
+	filepath.WalkDir(conf.Get("packages"), func(path string, d fs.DirEntry, err error) error {
 		if d.Name() == "layers" {
 			return fs.SkipDir
 		}
@@ -48,7 +48,7 @@ func (db *PackageDatabase) IndexFromRepo() error {
 				if err != nil {
 					return err
 				}
-				binpkg_path := filepath.Join(conf.HostDir(), "binpkgs", from_repo.GetFQN()+".tar.xz")
+				binpkg_path := filepath.Join(conf.Get("repo"), "binpkgs", from_repo.GetFQN()+".tar.xz")
 				pkgstat, err := os.Stat(binpkg_path)
 				doupdate := false
 
@@ -108,7 +108,7 @@ func (db *PackageDatabase) IndexFromRepo() error {
 
 		if !dbpkg.GeneratedValid {
 			ok := true
-			binpkg_path := filepath.Join(conf.HostDir(), "binpkgs", dbpkg.GetFQN()+".tar.xz")
+			binpkg_path := filepath.Join(conf.Get("repo"), "binpkgs", dbpkg.GetFQN()+".tar.xz")
 			_, err := os.Stat(binpkg_path)
 			if err == nil {
 				local_logger.Info("Pulling generated info from binpkg")

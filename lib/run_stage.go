@@ -10,7 +10,6 @@ import (
 
 	"gopkg.in/yaml.v2"
 	"m0rg.dev/x10/conf"
-	"m0rg.dev/x10/db"
 	"m0rg.dev/x10/runner"
 	"m0rg.dev/x10/spec"
 	"m0rg.dev/x10/x10_log"
@@ -24,14 +23,14 @@ func RunStage(pkg spec.SpecLayer, stage string) error {
 		logger.Info("  <empty stage>")
 		return nil
 	}
-	basepath := conf.BaseDir()
 
 	additional_args := []string{}
-	logger.Debug("files dir: " + filepath.Join(basepath, "files", pkg.Meta.Name))
-	_, err := os.Stat(filepath.Join(basepath, "files", pkg.Meta.Name))
+	filesdir := filepath.Join(conf.Get("packages"), "files", pkg.Meta.Name)
+	logger.Debug("files dir: " + filesdir)
+	_, err := os.Stat(filesdir)
 	if err == nil {
 		additional_args = append(additional_args, "-v")
-		additional_args = append(additional_args, fmt.Sprintf("%s:%s", filepath.Join(basepath, "files", pkg.Meta.Name), "/pkgfiles"))
+		additional_args = append(additional_args, fmt.Sprintf("%s:%s", filesdir, "/pkgfiles"))
 	}
 
 	script_chunks := []string{}
@@ -80,13 +79,13 @@ func RunStage(pkg spec.SpecLayer, stage string) error {
 			return err
 		}
 
-		db := db.PackageDatabase{BackingFile: conf.PkgDb()}
-		err = db.Update(pkg, false)
-		if err != nil {
-			logger.Error("Error while updating package database: ")
-			logger.Error(err)
-			return err
-		}
+		// db := db.PackageDatabase{BackingFile: conf.PkgDb()}
+		// err = db.Update(pkg, false)
+		// if err != nil {
+		// 	logger.Error("Error while updating package database: ")
+		// 	logger.Error(err)
+		// 	return err
+		// }
 	}
 
 	return nil

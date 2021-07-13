@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"path/filepath"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -41,60 +39,25 @@ func ReadConfig(path string) {
 	}
 }
 
-func Get(key string, def string) string {
-	// from_env, ok := os.LookupEnv(strings.ToUpper("x10_" + key))
-	from_env, ok := config[key]
+func Get(key string) string {
+	str, ok := config[key]
 	if !ok {
-		from_env = def
+		panic(fmt.Errorf("unknown configuration key: %s", key))
 	}
-	return from_env
+	return str
 }
 
-func Set(key string, val string) {
-	config[key] = val
-}
-
-func TargetDir() string {
-	return Get("targetdir", "./targetdir")
-}
-
-func HostDir() string {
-	return Get("hostdir", "./hostdir")
-}
-
-func PkgDb() string {
-	rc := filepath.Join(HostDir(), "binpkgs", "pkgdb.yml")
-	os.MkdirAll(filepath.Join(HostDir(), "binpkgs"), os.ModePerm)
-	return rc
-}
-
-func PackageDir() string {
-	return Get("packagedir", "./pkgs")
-}
-
-func BaseDir() string {
-	_, b, _, _ := runtime.Caller(0)
-	basepath, _ := filepath.Abs(filepath.Join(filepath.Dir(b), "../.."))
-	return basepath
-}
-
-func UseGeneratedDependencies() bool {
-	rc := Get("use_generated_dependencies", "true")
-	if rc == "true" {
-		return true
-	} else {
-		return false
+func GetBool(key string) bool {
+	str, ok := config[key]
+	if !ok {
+		panic(fmt.Errorf("unknown configuration key: %s", key))
 	}
+	return str == "true"
 }
 
-func ResetPackages() bool {
-	rc := Get("reset_packages", "true")
-	if rc == "true" {
-		return true
-	} else {
-		return false
-	}
-}
+// func Set(key string, val string) {
+// 	config[key] = val
+// }
 
 type ConfigKey struct {
 	HelpText   string
@@ -292,4 +255,9 @@ func PrintHelpText(command *string) {
 	}
 
 	os.Exit(1)
+}
+
+// TODO target profiles
+func TargetDir() string {
+	panic("NYI")
 }

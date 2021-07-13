@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"reflect"
 	"sort"
 	"strings"
@@ -74,6 +73,7 @@ func (db *PackageDatabase) unlocked_Write(contents *PackageDatabaseContents) err
 	return ioutil.WriteFile(db.BackingFile, d, os.ModePerm)
 }
 
+/*
 func (db *PackageDatabase) Update(pkg spec.SpecLayer, force_invalid bool) error {
 	logger := x10_log.Get("update").WithField("pkg", pkg.GetFQN())
 	// Attempt to grab generated dependencies
@@ -128,6 +128,7 @@ func (db *PackageDatabase) Update(pkg spec.SpecLayer, force_invalid bool) error 
 	logger.Info("Updated package database in " + db.BackingFile + ".")
 	return err
 }
+*/
 
 func (contents *PackageDatabaseContents) CheckUpToDate(from_repo spec.SpecLayer) bool {
 	logger := x10_log.Get("check").WithField("pkg", from_repo.GetFQN())
@@ -207,7 +208,7 @@ func (db *PackageDatabase) Resolve(logger *logrus.Entry, outstanding map[string]
 			pkg := contents.Packages[fqn]
 			all_depends := pkg.Depends.Run
 
-			if conf.UseGeneratedDependencies() {
+			if conf.GetBool("use-generated") {
 				if !pkg.GeneratedValid {
 					logger.Warnf("Need to evaluate %s but no generated depends", fqn)
 					complete = false

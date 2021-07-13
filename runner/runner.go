@@ -13,9 +13,7 @@ import (
 )
 
 func RunTargetScript(logger *logrus.Entry, script string, additional_podman_args []string) (err error) {
-	basepath := conf.BaseDir()
-
-	hostdir, err := filepath.Abs(conf.HostDir())
+	hostdir, err := filepath.Abs(conf.Get("repo"))
 	if err != nil {
 		return err
 	}
@@ -42,7 +40,7 @@ func RunTargetScript(logger *logrus.Entry, script string, additional_podman_args
 		}
 	}
 
-	args := []string{"run", "--rm", "-i", "-v", hostdir + ":/hostdir", "-v", basepath + "/etc:/etc/x10:ro"}
+	args := []string{"run", "--rm", "-i", "-v", hostdir + ":/hostdir", "-v"}
 	args = append(args, volume_args...)
 	args = append(args, additional_podman_args...)
 	args = append(args, "x10_base", "/usr/bin/bash", "-e", "-x")
