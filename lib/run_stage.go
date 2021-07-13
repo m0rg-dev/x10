@@ -28,8 +28,13 @@ func RunStage(pkg spec.SpecLayer, stage string, root string) error {
 
 	additional_args := []string{}
 	filesdir := filepath.Join(conf.Get("packages"), "files", pkg.Meta.Name)
+	filesdir, err := filepath.Abs(filesdir)
+	if err != nil {
+		return err
+	}
+
 	logger.Debug("files dir: " + filesdir)
-	_, err := os.Stat(filesdir)
+	_, err = os.Stat(filesdir)
 	if err == nil {
 		additional_args = append(additional_args, "-v")
 		additional_args = append(additional_args, fmt.Sprintf("%s:%s", filesdir, "/pkgfiles"))
