@@ -12,13 +12,13 @@ import (
 	"m0rg.dev/x10/conf"
 )
 
-func RunTargetScript(logger *logrus.Entry, script string, additional_podman_args []string) (err error) {
+func RunTargetScript(logger *logrus.Entry, root string, script string, additional_podman_args []string) (err error) {
 	hostdir, err := filepath.Abs(conf.Get("repo"))
 	if err != nil {
 		return err
 	}
 
-	targetdir, err := filepath.Abs(conf.TargetDir())
+	targetdir, err := filepath.Abs(root)
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func RunTargetScript(logger *logrus.Entry, script string, additional_podman_args
 		}
 	}
 
-	args := []string{"run", "--rm", "-i", "-v", hostdir + ":/hostdir", "-v"}
+	args := []string{"run", "--rm", "-i", "-v", hostdir + ":/hostdir", "-v", conf.Get("packages") + "/etc:/etc/x10/"}
 	args = append(args, volume_args...)
 	args = append(args, additional_podman_args...)
 	args = append(args, "x10_base", "/usr/bin/bash", "-e", "-x")

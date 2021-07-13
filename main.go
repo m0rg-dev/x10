@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"m0rg.dev/x10/commands"
@@ -30,8 +29,6 @@ func init() {
 
 func main() {
 	command, args := conf.ParseCommandLine(os.Args[1:])
-	fmt.Printf("%+v\n", command)
-	fmt.Printf("%+v\n", args)
 	commands.RunCommand(command, args)
 }
 

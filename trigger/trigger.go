@@ -7,7 +7,7 @@ import (
 )
 
 type Trigger interface {
-	RunInstall(logger *logrus.Entry, data interface{}) error
+	RunInstall(logger *logrus.Entry, root string, data interface{}) error
 }
 
 var triggers = map[string]Trigger{}
@@ -16,12 +16,12 @@ func RegisterTrigger(t Trigger, name string) {
 	triggers[name] = t
 }
 
-func RunTriggers(pkg spec.SpecLayer) error {
+func RunTriggers(pkg spec.SpecLayer, root string) error {
 	logger := x10_log.Get("trigger").WithField("pkg", pkg.GetFQN())
 	for name, t := range triggers {
 		data, ok := pkg.TriggerData[name]
 		if ok {
-			err := t.RunInstall(logger.WithField("trigger", name), data)
+			err := t.RunInstall(logger.WithField("trigger", name), root, data)
 			// TODO think about error handling in triggers, in general
 			if err != nil {
 				return err

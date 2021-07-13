@@ -92,6 +92,12 @@ func AssertArgumentCount(command string, count int, args []string) {
 	}
 }
 
+func AssertConfigured(command string, key string) {
+	if config[key] == "" {
+		ParseError(command + " subcommand expects " + key + " option")
+	}
+}
+
 func ParseCommandLine(args []string) (command string, additional_args []string) {
 	options := []string{}
 	// pass 1: find command and relevant options
@@ -112,24 +118,25 @@ func ParseCommandLine(args []string) (command string, additional_args []string) 
 		} else if strings.HasPrefix(arg, "--") {
 			opt := strings.TrimPrefix(arg, "--")
 			if command != "" {
-				opt = command + ":" + opt
+				if strings.HasPrefix(opt, "no-") {
+					opt = "no-" + command + ":" + strings.TrimPrefix(opt, "no-")
+				} else {
+					opt = command + ":" + opt
+				}
 			}
 
 			if strings.Contains(opt, "=") {
 				options = append(options, opt)
 			} else {
 				meta, ok := known_keys[opt]
-				if !ok {
-					ParseError("Unknown command-line option: " + opt)
-				}
-				if meta.TakesValue {
+				if ok && meta.TakesValue {
 					if len(args) == 0 {
 						ParseError("Option " + opt + " requires an argument")
 					}
 					opt = opt + "=" + args[0]
 					args = args[1:]
-					options = append(options, opt)
 				}
+				options = append(options, opt)
 			}
 		} else if command == "" {
 			command = arg
@@ -259,5 +266,5 @@ func PrintHelpText(command *string) {
 
 // TODO target profiles
 func TargetDir() string {
-	panic("NYI")
+	panic(fmt.Errorf("NYI"))
 }

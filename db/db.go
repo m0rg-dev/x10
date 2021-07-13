@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"reflect"
 	"sort"
 	"strings"
@@ -70,16 +71,20 @@ func (db *PackageDatabase) unlocked_Write(contents *PackageDatabaseContents) err
 		return err
 	}
 
+	err = os.MkdirAll(filepath.Dir(db.BackingFile), os.ModePerm)
+	if err != nil {
+		return err
+	}
+
 	return ioutil.WriteFile(db.BackingFile, d, os.ModePerm)
 }
 
-/*
-func (db *PackageDatabase) Update(pkg spec.SpecLayer, force_invalid bool) error {
+func (db *PackageDatabase) Update(pkg spec.SpecLayer, root string, force_invalid bool) error {
 	logger := x10_log.Get("update").WithField("pkg", pkg.GetFQN())
 	// Attempt to grab generated dependencies
 	dbpkg := pkg.ToDB()
 	dbpkg.GeneratedValid = true
-	gen_depends, err := ioutil.ReadFile(filepath.Join(conf.TargetDir(), "destdir", pkg.GetFQN(), "generated-depends"))
+	gen_depends, err := ioutil.ReadFile(filepath.Join(root, "destdir", pkg.GetFQN(), "generated-depends"))
 	if err == nil {
 		dbpkg.GeneratedDepends = strings.Split(strings.TrimSpace(string(gen_depends)), "\n")
 	} else {
@@ -89,7 +94,7 @@ func (db *PackageDatabase) Update(pkg spec.SpecLayer, force_invalid bool) error 
 			logger.Debug(" => no generated depends")
 		}
 	}
-	gen_provides, err := ioutil.ReadFile(filepath.Join(conf.TargetDir(), "destdir", pkg.GetFQN(), "generated-provides"))
+	gen_provides, err := ioutil.ReadFile(filepath.Join(root, "destdir", pkg.GetFQN(), "generated-provides"))
 	if err == nil {
 		dbpkg.GeneratedProvides = strings.Split(strings.TrimSpace(string(gen_provides)), "\n")
 	} else {
@@ -128,7 +133,6 @@ func (db *PackageDatabase) Update(pkg spec.SpecLayer, force_invalid bool) error 
 	logger.Info("Updated package database in " + db.BackingFile + ".")
 	return err
 }
-*/
 
 func (contents *PackageDatabaseContents) CheckUpToDate(from_repo spec.SpecLayer) bool {
 	logger := x10_log.Get("check").WithField("pkg", from_repo.GetFQN())
@@ -251,7 +255,7 @@ func (db *PackageDatabase) Resolve(logger *logrus.Entry, outstanding map[string]
 }
 
 func (db *PackageDatabase) GetInstallDeps(top_level string, dep_type DependencyType) (pkgs []spec.SpecDbData, complete bool, err error) {
-	logger := x10_log.Get("index").WithField("toplevel", top_level)
+	logger := x10_log.Get("deps").WithField("toplevel", top_level)
 
 	contents, err := db.Read()
 	if err != nil {

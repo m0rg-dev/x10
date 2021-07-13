@@ -31,7 +31,9 @@ func (db *PackageDatabase) IndexFromRepo() error {
 	var updates sync.Map
 
 	filepath.WalkDir(conf.Get("packages"), func(path string, d fs.DirEntry, err error) error {
-		if d.Name() == "layers" {
+		if d.Name() == "layers" ||
+			d.Name() == "files" ||
+			d.Name() == "etc" {
 			return fs.SkipDir
 		}
 		if d.Type().IsRegular() {

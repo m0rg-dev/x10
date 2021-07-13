@@ -10,12 +10,14 @@ import (
 
 	"gopkg.in/yaml.v2"
 	"m0rg.dev/x10/conf"
+	"m0rg.dev/x10/db"
 	"m0rg.dev/x10/runner"
 	"m0rg.dev/x10/spec"
 	"m0rg.dev/x10/x10_log"
+	"m0rg.dev/x10/x10_util"
 )
 
-func RunStage(pkg spec.SpecLayer, stage string) error {
+func RunStage(pkg spec.SpecLayer, stage string, root string) error {
 	logger := x10_log.Get("run").WithField("stage", stage).WithField("package", pkg.GetFQN())
 	logger.Info("Running")
 
@@ -46,7 +48,7 @@ func RunStage(pkg spec.SpecLayer, stage string) error {
 	}
 	script_chunks = append(script_chunks, pkg.Stages[stage].PostScript...)
 
-	err = runner.RunTargetScript(logger, strings.Join(script_chunks, "\n"), additional_args)
+	err = runner.RunTargetScript(logger, root, strings.Join(script_chunks, "\n"), additional_args)
 
 	if err != nil {
 		return err
@@ -59,7 +61,7 @@ func RunStage(pkg spec.SpecLayer, stage string) error {
 			logger.Error(err)
 			return err
 		}
-		err = ioutil.WriteFile(filepath.Join(conf.TargetDir(), "destdir", pkg.GetFQN(), "meta.yml"), d, fs.ModePerm)
+		err = ioutil.WriteFile(filepath.Join(root, "destdir", pkg.GetFQN(), "meta.yml"), d, fs.ModePerm)
 		if err != nil {
 			logger.Error("Error while writing package metadata: ")
 			logger.Error(err)
@@ -72,20 +74,20 @@ func RunStage(pkg spec.SpecLayer, stage string) error {
 			logger.Error(err)
 			return err
 		}
-		err = ioutil.WriteFile(filepath.Join(conf.TargetDir(), "destdir", pkg.GetFQN(), "depends.yml"), d, fs.ModePerm)
+		err = ioutil.WriteFile(filepath.Join(root, "destdir", pkg.GetFQN(), "depends.yml"), d, fs.ModePerm)
 		if err != nil {
 			logger.Error("Error while writing package dependencies: ")
 			logger.Error(err)
 			return err
 		}
 
-		// db := db.PackageDatabase{BackingFile: conf.PkgDb()}
-		// err = db.Update(pkg, false)
-		// if err != nil {
-		// 	logger.Error("Error while updating package database: ")
-		// 	logger.Error(err)
-		// 	return err
-		// }
+		db := db.PackageDatabase{BackingFile: x10_util.PkgDb(root)}
+		err = db.Update(pkg, root, false)
+		if err != nil {
+			logger.Error("Error while updating package database: ")
+			logger.Error(err)
+			return err
+		}
 	}
 
 	return nil

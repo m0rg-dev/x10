@@ -15,7 +15,7 @@ func init() {
 	RegisterTrigger(XmlCatalogTrigger{}, "xmlcatalog")
 }
 
-func (XmlCatalogTrigger) RunInstall(logger *logrus.Entry, raw_data interface{}) error {
+func (XmlCatalogTrigger) RunInstall(logger *logrus.Entry, root string, raw_data interface{}) error {
 	data := XmlCatalogTriggerData{}
 	raw_data_map := raw_data.(map[interface{}]interface{})
 	if raw_data_map["sgmlentries"] != nil {
@@ -29,7 +29,7 @@ func (XmlCatalogTrigger) RunInstall(logger *logrus.Entry, raw_data interface{}) 
 		logger.Info("Registering SGML catalog entries...")
 		for _, entry := range data.SgmlEntries {
 			logger.Info(entry)
-			err := runner.RunTargetScript(logger, "/usr/bin/xmlcatmgr -sc /usr/share/sgml/catalog add "+entry, []string{})
+			err := runner.RunTargetScript(logger, root, "/usr/bin/xmlcatmgr -sc /usr/share/sgml/catalog add "+entry, []string{})
 			if err != nil {
 				return err
 			}
@@ -40,7 +40,7 @@ func (XmlCatalogTrigger) RunInstall(logger *logrus.Entry, raw_data interface{}) 
 		logger.Info("Registering XML catalog entries...")
 		for _, entry := range data.XmlEntries {
 			logger.Info(entry)
-			err := runner.RunTargetScript(logger, "/usr/bin/xmlcatmgr -c /usr/share/xml/catalog add "+entry, []string{})
+			err := runner.RunTargetScript(logger, root, "/usr/bin/xmlcatmgr -c /usr/share/xml/catalog add "+entry, []string{})
 			if err != nil {
 				return err
 			}
