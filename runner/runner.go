@@ -18,7 +18,7 @@ func RunTargetScript(logger *logrus.Entry, root string, script string, additiona
 		return err
 	}
 
-	pkgs, err := filepath.Abs(conf.Get("pkgs"))
+	pkgs, err := filepath.Abs(conf.Get("packages"))
 	if err != nil {
 		return err
 	}
