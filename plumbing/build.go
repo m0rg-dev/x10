@@ -82,7 +82,18 @@ func Build(name string) error {
 
 	logger.Infof("Building dependencies (run).")
 	for _, atom := range pkg.Depends.Run {
-		Build(atom)
+		fqn, err := contents.FindFQN(atom)
+		if err != nil {
+			return err
+		}
+		dep, err := pkgdb.Get(*fqn)
+		if err != nil {
+			return err
+		}
+
+		if !dep.GeneratedValid {
+			Build(atom)
+		}
 	}
 
 	return nil
