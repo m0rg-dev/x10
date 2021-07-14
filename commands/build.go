@@ -46,14 +46,6 @@ func (cmd BuildCommand) Run(args []string) error {
 		logger.Fatal(err)
 	}
 
-	// if conf.GetBool("build:reset") {
-	// 	logger.Info("Removing autodeps")
-	// 	err := plumbing.Reset(logger, conf.Get("build:target-root"))
-	// 	if err != nil {
-	// 		logger.Fatal(err)
-	// 	}
-	// }
-
 	contents, err := pkgdb.Read()
 	if err != nil {
 		logger.Fatal(err)

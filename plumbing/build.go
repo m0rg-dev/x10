@@ -71,6 +71,17 @@ func Build(name string) error {
 					return err
 				}
 			}
+		}
+
+		if conf.GetBool("build:reset") {
+			logger.Info("Removing autodeps")
+			err := Reset(logger, conf.Get("build:target-root"))
+			if err != nil {
+				logger.Fatal(err)
+			}
+		}
+
+		for _, dep := range pkgs {
 			err := lib.Install(pkgdb, dep, root)
 			if err != nil {
 				return err
