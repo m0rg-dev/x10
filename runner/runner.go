@@ -45,7 +45,11 @@ func RunTargetScript(logger *logrus.Entry, root string, script string, additiona
 		}
 	}
 
-	args := []string{"run", "--rm", "-i", "-v", hostdir + ":/hostdir", "-v", pkgs + "/etc:/etc/x10/"}
+	args := []string{"run", "--rm", "-i",
+		"-v", hostdir + ":/hostdir",
+		"-v", pkgs + "/etc:/etc/x10/",
+		"-v", pkgs + "/files:/pkgfiles",
+	}
 	args = append(args, volume_args...)
 	args = append(args, additional_podman_args...)
 	args = append(args, "x10_base", "/usr/bin/bash", "-e", "-x")
