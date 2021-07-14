@@ -33,7 +33,7 @@ func Build(name string) error {
 		logger.Infof(stage)
 
 		outstanding := map[string]bool{}
-		if stage == "configure" || stage == "build" {
+		if stage == "configure" || stage == "build" || stage == "install" {
 			logger.Infof("Finding dependencies (build).")
 			for _, atom := range pkg.Depends.Build {
 				fqn, err := contents.FindFQN(atom)
@@ -74,17 +74,52 @@ func Build(name string) error {
 		}
 
 		if conf.GetBool("build:reset") {
-			logger.Info("Removing autodeps")
-			err := Reset(logger, conf.Get("build:target-root"))
-			if err != nil {
-				logger.Fatal(err)
-			}
-		}
+			logger.Info("Ensuring package state.")
 
-		for _, dep := range pkgs {
-			err := lib.Install(pkgdb, dep, root)
+			world, err := GetWorld(root)
 			if err != nil {
 				return err
+			}
+
+			fqn, err := contents.FindFQN("virtual/base-minimal")
+			if err != nil {
+				return err
+			}
+
+			world.Clear()
+			world.Mark(*fqn)
+			for _, dep := range pkgs {
+				world.Mark(dep.GetFQN())
+			}
+			plan, err := CheckPlan(logger, pkgdb, root, world)
+			if err != nil {
+				return err
+			}
+
+			for _, op := range plan {
+				if op.Op == db.ActionInstall {
+					err := lib.Install(pkgdb, contents.Packages[op.Fqn], root)
+					if err != nil {
+						return err
+					}
+				} else {
+					err := lib.Remove(pkgdb, contents.Packages[op.Fqn], root)
+					if err != nil {
+						return err
+					}
+				}
+			}
+
+			err = world.Write()
+			if err != nil {
+				return err
+			}
+		} else {
+			for _, dep := range pkgs {
+				err := lib.Install(pkgdb, dep, root)
+				if err != nil {
+					return err
+				}
 			}
 		}
 
