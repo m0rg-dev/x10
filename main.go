@@ -11,13 +11,13 @@ func init() {
 	conf.RegisterKey("", "packages", conf.ConfigKey{
 		HelpText:   "Path to the directory containing package definitions.",
 		TakesValue: true,
-		Default:    "../digitalis-linux/pkgs",
+		Default:    "./pkgs",
 	})
 
 	conf.RegisterKey("", "repo", conf.ConfigKey{
 		HelpText:   "Path to the binary package repository.",
 		TakesValue: true,
-		Default:    "../digitalis-linux/hostdir",
+		Default:    "./repo",
 	})
 
 	conf.RegisterKey("", "use-generated", conf.ConfigKey{

@@ -16,7 +16,7 @@ func init() {
 
 	conf.RegisterKey("build", "target-root", conf.ConfigKey{
 		HelpText:   "Directory to chroot (or equivalent) to during build.",
-		Default:    "",
+		Default:    "./targetdir",
 		TakesValue: true,
 	})
 
